@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/getParameter.js"></script>
+    <script>
+        $(function () {
+            var key = getParameter("key");
+            $.post("student/modify",{"key":key},function (data) {
+                //转换json串
+                var obj = eval( "(" + data + ")" );
+                //数据回显
+                var li =
+                        '学生id<input type="text" name="id" value="'+obj.id+'"><br>\n' +
+                        '学生姓名<input type="text" name="name" value="'+obj.name+'"><br>\n' +
+                        '学生描述<input type="text" name="description" value="'+obj.description+'"><br>\n' +
+                        '学生生日<input type="date" name="birthday" value="'+obj.birthday+'"><br>\n' +
+                        '学生平均分<input type="text" name="avgscore" value="'+obj.avgscore+'"><br>\n' +
+                        '<input type="submit">';
+
+                $("#form").html(li);
+            });
+        })
+    </script>
+</head>
+<body>
+    <div><h1>数据修改</h1></div>
+    <form id="form" method="post" action="student/add"></form>
+</body>
+</html>

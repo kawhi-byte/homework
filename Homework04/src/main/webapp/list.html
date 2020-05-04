@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生列表</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script>
+        $(function () {
+            query(1,10);
+        });
+
+        //删除数据
+        function deleteFromRedis(s,n) {
+            if (confirm("您确认要删除吗？")) {
+                $.post("student/delete", {"score": s,"name":n}, function (data) {
+                    if (data.flag) {
+                        alert("删除成功！");
+                        location.href = "http://120.26.52.46:8888/Homework04/list.html";
+                    } else {
+                        alert("删除失败！");
+                    }
+                });
+            }
+        }
+
+        //修改数据
+        function modify(s,n) {
+            var key = s + n;
+            location.href = "http://120.26.52.46:8888/Homework04/modify.html?key="+key;
+        }
+
+        function query(currentPage,rows) {
+            $.post("student/query?currentPage="+currentPage+"&rows="+rows,function (data) {
+                var stu_list = '<tr>\n' +
+                    '<th>id</th>\n' +
+                    '<th>姓名</th>\n' +
+                    '<th>描述</th>\n' +
+                    '<th>生日</th>\n' +
+                    '<th>平均分</th>\n' +
+                    '<th>操作</th>\n' +
+                    '</tr>';
+                for (var i = 0; i < data.list.length; i++){
+                    var stu = data.list[i];
+                    var list = '<tr>\n' +
+                        '<th>'+stu.id+'</th>\n' +
+                        '<th>'+stu.name+'</th>\n' +
+                        '<th>'+stu.description+'</th>\n' +
+                        '<th>'+stu.birthday+'</th>\n' +
+                        '<th>'+stu.avgscore+'</th>' +
+                        '<th>\n' +
+                        '<button onclick="deleteFromRedis('+stu.avgscore+',\''+stu.name+'\')">删除</button>\n' +
+                        '<button onclick="modify('+stu.avgscore+',\''+stu.name+'\');">修改</button>\n' +
+                        '</th>\n' +
+                        '</tr>\n';
+                    stu_list += list;
+                }
+                $("#student").html(stu_list);
+
+                //页码信息、总记录数展示
+                $("#count_page").html(data.totalPage);
+                $("#count_data").html(data.totalCount);
+
+                //分页条展示
+                var pageNumber_lis = "";
+                for (var i = 1; i <= data.totalPage; i++) {
+                    pageNumber_lis += '<button onclick="query('+i+',10)">'+i+'</button>'
+                }
+                $("#pageNum").html(pageNumber_lis);
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- 学生数据展示 -->
+    <div align="center"><h1>学生列表</h1></div>
+    <div align="center"><a href="http://120.26.52.46:8888/Homework04/add.html">新增</a></div><br>
+    <table id="student" border="1" align="center"></table><br>
+    <!-- 记录数和页数的展示 -->
+    <div align="center">
+        共<span id="count_page"></span>页<span id="count_data"></span>条
+    </div>
+    <!-- 分页条的展示 -->
+    <div id="pageNum" align="center">
+    </div>
+</body>
+</html>
